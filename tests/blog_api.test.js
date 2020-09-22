@@ -11,7 +11,7 @@ const api = supertest(app)
 
 
 describe('test blog', () => {
-  beforeEach(async () => {
+  beforeEach(async done => {
     await blogModel.deleteMany({})
     logger.info('cleared')
 
@@ -19,6 +19,7 @@ describe('test blog', () => {
       .map(blog => new blogModel(blog))
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
+    done()
   })
 
 
@@ -34,7 +35,24 @@ describe('test blog', () => {
     response.body.map(blog => expect(blog).toHaveProperty('id'))
   })
 
-  afterAll(() => {
+  test('add a new blog', async () => {
+    const newBlog = {
+      title: 'nice', author: 'xue', url: 'www.google.com', likes: 3
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const newBlogs = await blogHelper.blogsInDb()
+    expect(newBlogs.length).toBe(blogHelper.initialBlogs.length + 1)
+    const newContents = newBlogs.map(blog => blog.title)
+    expect(newContents).toContain('nice')
+  })
+
+  afterAll(done => {
     mongoose.connection.close()
+    done()
   })
 })

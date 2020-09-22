@@ -5,7 +5,7 @@ require('express-async-errors')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await blogModel.find({})
-  response.json(blogs)
+  response.json(blogs.map(blog => blog.toJSON()))
 })
 
 blogRouter.get('/:id', (request, response, next) => {
@@ -20,15 +20,11 @@ blogRouter.get('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-blogRouter.post('/', (request, response, next) => {
+blogRouter.post('/', async (request, response) => {
   const blog = new blogModel(request.body)
 
-  blog
-    .save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-    })
-    .catch(error => next(error))
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog.toJSON())
 })
 
 blogRouter.delete('/:id', (request, response, next) => {
