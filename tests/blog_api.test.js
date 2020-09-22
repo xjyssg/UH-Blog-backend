@@ -22,11 +22,16 @@ describe('test blog', () => {
   })
 
 
-  test('get all blogs', async () => {
+  test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
+  })
+
+  test('verify id property', async () => {
+    const response = await api.get('/api/blogs')
+    response.body.map(blog => expect(blog).toHaveProperty('id'))
   })
 
   afterAll(() => {
