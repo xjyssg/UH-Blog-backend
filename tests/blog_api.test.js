@@ -61,6 +61,24 @@ describe('test blog', () => {
     expect(savedBlog.body.likes).toBeGreaterThan(0)
   })
 
+  test('new blog has title and url', async () => {
+    const newBlog1 = {
+      author: 'xue', url: 'www.google.com', likes: 3
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog1)
+      .expect(400)
+
+    const newBlog2 = {
+      title: 'nice', author: 'xue', likes: 3
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog2)
+      .expect(400)
+  })
+
   afterAll(done => {
     mongoose.connection.close()
     done()
