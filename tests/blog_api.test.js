@@ -51,6 +51,16 @@ describe('test blog', () => {
     expect(newContents).toContain('nice')
   })
 
+  test('new blog has likes property', async () => {
+    const newBlog = {
+      title: 'nice', author: 'xue', url: 'www.google.com', likes: 3
+    }
+    const savedBlog = await api
+      .post('/api/blogs')
+      .send(newBlog)
+    expect(savedBlog.body.likes).toBeGreaterThan(0)
+  })
+
   afterAll(done => {
     mongoose.connection.close()
     done()
