@@ -1,0 +1,9 @@
+PUT http://localhost:3003/api/blogs/5f6824e2ebd9ee4fa091674b
+Content-Type: application/json
+
+{
+    "title": "good news",
+    "author": "xue",
+    "url": "https://www.baidu.com",
+    "likes": 7
+}
