@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InhqeSIsImlkIjoiNWY2YmZlMjcwZjFlMjUzMzZjM2M2MWQ2IiwiaWF0IjoxNjAwOTMwODgxfQ.eEJqD55H8YM3C6CxleEZXUXDOoAMOjOVjyWnvgGm4a4
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InhqeSIsImlkIjoiNWY2YmZlMjcwZjFlMjUzMzZjM2M2MWQ2IiwiaWF0IjoxNjAwOTMwODgxfQ.eEJqD55H8YM3C6CxleEZXUXDOoAMOjOVjyWnvgGm4a40
 
 {
     "title": "bad news",

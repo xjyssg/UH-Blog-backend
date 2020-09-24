@@ -43,9 +43,16 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-  await blogModel.findByIdAndDelete(request.params.id)
+  const blog = await blogModel.findById(request.params.id)
 
-  response.status(204).end()
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!request.token || blog.user.toString() !== decodedToken.id.toString()) {
+    return response.status(403).json({ error: 'access denied' })
+  } else {
+    await blogModel.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  }
+
 })
 
 blogRouter.put('/:id', async (request, response) => {
