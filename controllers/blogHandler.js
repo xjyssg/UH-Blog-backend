@@ -1,5 +1,5 @@
 const blogRouter = require('express').Router()
-const blogModel = require('../models/db')
+const blogModel = require('../models/blogDB')
 require('express-async-errors')
 
 
@@ -46,5 +46,6 @@ blogRouter.put('/:id', async (request, response) => {
   const updatedBlog = await blogModel.findByIdAndUpdate(request.params.id, blog, { new: true, runValidators: true })
   response.json(updatedBlog)
 })
+
 
 module.exports = blogRouter

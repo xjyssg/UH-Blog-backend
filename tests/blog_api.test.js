@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 require('express-async-errors')
-const blogModel = require('../models/db')
+const blogModel = require('../models/blogDB')
 const logger = require('../utils/logger')
 const blogHelper = require('./blog_helper')
 
