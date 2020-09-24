@@ -9,15 +9,14 @@ const app = require('../app')
 const api = supertest(app)
 
 
-beforeEach(async done => {
+beforeEach(async () => {
   await userModel.deleteMany({})
-  logger.info('cleared')
+  logger.info('users cleared')
 
   const userObjects = userHelper.initialUsers
     .map(user => new userModel(user))
   const promiseArray = userObjects.map(user => user.save())
   await Promise.all(promiseArray)
-  done()
 })
 
 describe('get users', () => {

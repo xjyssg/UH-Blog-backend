@@ -2,27 +2,34 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 require('express-async-errors')
 const blogModel = require('../models/blogDB')
+const userModel = require('../models/userDB')
 const logger = require('../utils/logger')
 const blogHelper = require('./blog_helper')
+const userHelper = require('./user_helper')
 
 const app = require('../app')
 const api = supertest(app)
 
 
+beforeEach(async () => {
+  await blogModel.deleteMany({})
+  logger.info('blogs cleared')
 
-describe('test blog', () => {
-  beforeEach(async done => {
-    await blogModel.deleteMany({})
-    logger.info('cleared')
+  const blogObjects = blogHelper.initialBlogs
+    .map(blog => new blogModel(blog))
+  const blogPromiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(blogPromiseArray)
 
-    const blogObjects = blogHelper.initialBlogs
-      .map(blog => new blogModel(blog))
-    const promiseArray = blogObjects.map(blog => blog.save())
-    await Promise.all(promiseArray)
-    done()
-  })
+  await userModel.deleteMany({})
+  logger.info('users cleared')
 
+  const userObjects = userHelper.initialUsers
+    .map(user => new userModel(user))
+  const userPromiseArray = userObjects.map(user => user.save())
+  await Promise.all(userPromiseArray)
+})
 
+describe('get blogs', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -34,13 +41,16 @@ describe('test blog', () => {
     const response = await api.get('/api/blogs')
     response.body.map(blog => expect(blog).toHaveProperty('id'))
   })
+})
 
-  test('add a new blog', async () => {
+describe('create blog', () => {
+  test('create with auth', async () => {
     const newBlog = {
       title: 'nice', author: 'xue', url: 'www.google.com', likes: 3
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${userHelper.rootToken}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -51,22 +61,34 @@ describe('test blog', () => {
     expect(newContents).toContain('nice')
   })
 
-  test('new blog has likes property', async () => {
+  test('create without auth', async () => {
+    const newBlog = {
+      title: 'nice', author: 'xue', url: 'www.google.com', likes: 3
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+  })
+
+  test('has likes property', async () => {
     const newBlog = {
       title: 'nice', author: 'xue', url: 'www.google.com', likes: 3
     }
     const savedBlog = await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${userHelper.rootToken}`)
       .send(newBlog)
     expect(savedBlog.body.likes).toBeGreaterThan(0)
   })
 
-  test('new blog has title and url', async () => {
+  test('has title and url', async () => {
     const newBlog1 = {
       author: 'xue', url: 'www.google.com', likes: 3
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${userHelper.rootToken}`)
       .send(newBlog1)
       .expect(400)
 
@@ -75,12 +97,15 @@ describe('test blog', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${userHelper.rootToken}`)
       .send(newBlog2)
       .expect(400)
   })
+})
 
-  afterAll(done => {
-    mongoose.connection.close()
-    done()
-  })
+
+afterAll(() => {
+  mongoose.connection.close()
+  mongoose.disconnect()
+  logger.info('connection closed')
 })
