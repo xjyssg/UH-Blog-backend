@@ -5,23 +5,19 @@ require('express-async-errors')
 const jwt = require('jsonwebtoken')
 
 
-
-
 blogRouter.get('/', async (request, response) => {
   const blogs = await blogModel.find({}).populate('user', { username: 1, name: 1, id: 1 })
   response.json(blogs.map(blog => blog.toJSON()))
 })
 
-blogRouter.get('/:id', (request, response, next) => {
-  blogModel.findById(request.params.id)
-    .then(blog => {
-      if (blog) {
-        response.json(blog)
-      } else {
-        response.status(404).end()
-      }
-    })
-    .catch(error => next(error))
+blogRouter.get('/:id', async (request, response) => {
+  const blog = await blogModel.findById(request.params.id)
+
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
+  }
 })
 
 blogRouter.post('/', async (request, response) => {
